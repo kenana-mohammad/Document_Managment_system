@@ -9,12 +9,12 @@ class Document extends Model
 {
     use HasFactory;
     protected $fillable=[
-      'name','description','files','user_id','department_id'
+      'name','description','files','user_id','department_id','category_id'
     ];
-    //many to many
+    //one to many
     public function category()
 {
-    return $this->beLongsToMany(category::class,'category_document');
+    return $this->beLongsTo(category::class);
 }
     //one to many
     public function UserDocument(){

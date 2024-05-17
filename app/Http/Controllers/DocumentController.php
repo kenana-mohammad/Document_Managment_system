@@ -48,19 +48,19 @@ class DocumentController extends Controller
                 $path = $request->file('files')->storeAs('files', $filename, 'public');
                 $files = $path;
         }
+                  //تخزين النوع تلقاىيا بناء على اللاحقة
 
+
+          $category=Category::where('mimeType',$extension)->firstOrFail();
 
                   $document=Document::create([
                       'name' =>$request->name,
                       'description'=>$request->description,
                       'user_id'=>Auth::user()->id,
+                      'category_id'=> $category->id,
                       'department_id'=>$request->department_id,
                       'files'=> $files,
                   ]);
-                  //تخزين النوع تلقاىيا بناء على اللاحقة
-                  $request->category_id = Category::where('mimeType',$extension)->FirstOrFail();
-
-                  $document->category()->attach($request->category_id);
 
                   DB::commit();
                   return response()->json([
@@ -70,8 +70,12 @@ class DocumentController extends Controller
 
         }
         catch(Throwable $th){
-            return handleException($th);
-
+            DB::rollback();
+            Log::debug($th);
+            Log::error($th->getMessage());
+            return response()->json([
+                'status' => 'error',
+            ]);
 
     }
     }
@@ -115,7 +119,13 @@ class DocumentController extends Controller
 
 
             $newData['files'] = $files ;
+            $category = Category::where('mimeType',$extension)->FirstOrFail();
+
+            $newData['category_id']= $category->id;
+
          }
+
+
 
 
 
@@ -127,8 +137,6 @@ DB::commit();
     ]);
 }
 $document->update($newData);
-$request->category_id = Category::where('mimeType',$extension)->FirstOrFail();
-$document->category()->sync($request->category_id);
 return response()->json([
   'status' =>'update',
   'document'=>$document
@@ -167,11 +175,7 @@ return response()->json([
             ]);
         }
 
-        $category = $document->category;
 $document->delete();
-        if ($category) {
-            $document->category()->detach();
-        }
 
         return response()->json([
             'status' => 'delete'

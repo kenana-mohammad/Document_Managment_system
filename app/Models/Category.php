@@ -11,9 +11,9 @@ class Category extends Model
     protected $fillable=[
      'mimeType'
     ];
-//many to many
+//one to many
     public function DocumentsCategory()
     {
-        return $this->beLongsToMany(Document::class,'category_document');
+        return $this->hasMany(Document::class);
     }
 }
