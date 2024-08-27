@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DocumentController;
@@ -45,3 +46,6 @@ Route::get('/download/{id}',[DocumentController::class,'Download']);
 Route::Post("/addTag/{id}",[TagController::class,'AddTag'])->middleware('auth');
 Route::put("/updateTag/{id}",[TagController::class,'updateTag'])->middleware('auth');
 Route::Delete("/DeleteTag/{id}",[TagController::class,'DeleteTag'])->middleware('auth');
+//chat
+Route::get('/chat/{user_id}',[ChatController::class,'chat_form'])->middleware('auth');
+Route::Post('/send-message/{user_id}',[ChatController::class,'send_message'])->middleware('auth');
